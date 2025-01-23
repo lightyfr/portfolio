@@ -128,12 +128,10 @@ const octokit = new Octokit({
 
 async function fetchGitHubData() {
   try {
-    const currentYear = new Date().getFullYear();
-    const startOfYear = new Date(currentYear, 0, 1).toISOString();
-    const endOfYear = new Date(currentYear, 11, 31).toISOString();
+    let repos;
 
     try {
-      const { data: repos } = await octokit.repos.listForAuthenticatedUser({
+      repos = await octokit.repos.listForAuthenticatedUser({
         visibility: 'all',
       });
     } catch (error) {
@@ -142,14 +140,15 @@ async function fetchGitHubData() {
 
     let totalCommits = 0;
 
-    for (const repo of repos) {
+
+
+    for (const repo of repos.data) {
       console.log(`Fetching commits for repo: ${repo.name}`);
       try {
         const { data: commits } = await octokit.repos.listCommits({
           owner: "lightyfr",
           repo: repo.name,
-          since: startOfYear,
-          until: endOfYear,
+
           per_page: 100,
         });
         totalCommits += commits.length;
@@ -163,7 +162,7 @@ async function fetchGitHubData() {
     return {
       commitsThisYear: totalCommits,
       yearsOfExperience: new Date().getFullYear() - new Date(user.created_at).getFullYear(),
-      completedProjects: repos.length,
+      completedProjects: repos.data.length,
       awardsReceived: 6, // This would need to be manually updated or fetched from another source
     };
   } catch (error) {
