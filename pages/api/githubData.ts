@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 
 interface CacheData {
   totalCommits: number;
+  totalRepos: number;
   timestamp: number;
 }
 
@@ -33,9 +34,9 @@ async function writeCacheData(data: CacheData): Promise<void> {
 
 async function fetchCommitCount(token: string): Promise<number> {
   // Check memory cache first
-  if (memoryCache?.totalCommits && Date.now() - memoryCache.timestamp < CACHE_DURATION) {
-    return memoryCache.totalCommits;
-  }
+  //if (memoryCache?.totalCommits && Date.now() - memoryCache.timestamp < CACHE_DURATION) {
+  //  return memoryCache.totalCommits;
+  //}
 
   // Check file cache
   const cachedData = await getCachedData();
@@ -45,55 +46,59 @@ async function fetchCommitCount(token: string): Promise<number> {
   }
 
   try {
-    const response = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: `
-          query {
-            viewer {
-              contributionsCollection {
-                totalCommitContributions
-              }
-            }
-          }
-        `
-      }),
-    });
+    const response = await fetch('https://github-contributions-api.deno.dev/lightyfr.text');
+    const data = await response.text();
 
-    const data = await response.json();
-    const totalCommits = data.data.viewer.contributionsCollection.totalCommitContributions;
+    // Extract contribution count from response like "597 contributions in the last year"
+    const contributionCount = parseInt(data.split(' ')[0]);
 
     // Update both caches
-    const newCache: CacheData = { totalCommits, timestamp: Date.now() };
+    const newCache: CacheData = {
+      totalCommits: contributionCount, timestamp: Date.now(),
+      totalRepos: 0
+    };
     memoryCache = newCache;
     await writeCacheData(newCache);
 
-    return totalCommits;
+    return contributionCount;
   } catch (error) {
     console.error('Failed to fetch commit count:', error);
     return cachedData?.totalCommits || 0;
   }
 }
 
+async function fetchRepoCount(token: string): Promise<number> {
+  const response = await fetch('https://api.github.com/user/repos?per_page=100', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    console.error('Failed to fetch repo count:', response.status);
+    return 0;
+  }
+  const repos = await response.json();
+  return repos.length;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const token = process.env.GITHUB_TOKEN;
-        if (!token) throw new Error('Missing GITHUB_TOKEN');
+  try {
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) throw new Error('Missing GITHUB_TOKEN');
 
-        const commitCount = await fetchCommitCount(token);
-        const responseData: CacheData = {
-            totalCommits: commitCount,
-            timestamp: Date.now()
-        };
+    const totalRepos = await fetchRepoCount(token);
+    const totalCommits = await fetchCommitCount(token);
 
-        await writeCacheData(responseData);
-        res.status(200).json(responseData);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to fetch GitHub data' });
-    }
+    const responseData: CacheData = {
+      totalRepos,
+      totalCommits,
+      timestamp: 0
+    };
+
+    memoryCache = responseData;
+    await writeCacheData(responseData);
+    res.status(200).json(responseData);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch GitHub data' });
+  }
 }

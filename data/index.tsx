@@ -154,7 +154,8 @@ export async function fetchGitHubData() {
     const data = await fetchWithRetry(`${baseUrl}/api/githubData`, undefined);
     return {
       totalCommits: data?.totalCommits || 0,
-      totalRepos: data?.totalRepos || 0
+      totalRepos: data?.totalRepos || 0,
+      yearsOfExperience: data?.yearsOfExperience || 2
     };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
@@ -167,13 +168,13 @@ const githubData = await fetchGitHubData();
 export const counterLists: counterListsType[] = [
   {
     id: 1,
-    title: "Commits This Year",
+    title: "Contribs This Year",
     value: githubData.totalCommits,
   },
   {
     id: 2,
     title: "Years of Experience",
-    value: 3, // Update this manually
+    value: githubData.yearsOfExperience, // Update this manually
   },
   {
     id: 3,
