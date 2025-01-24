@@ -124,13 +124,18 @@ export const socialBrands: socialBrandsTypes[] = [
   },
 ];
 
-// Update the fetchGitHubData function
-export async function fetchGitHubData() {
+interface GitHubData {
+  totalCommits: number;
+  totalRepos: number;
+  yearsOfExperience: number;
+}
+
+export async function fetchGitHubData(): Promise<GitHubData> {
   const baseUrl = process.env.NODE_ENV === 'production' 
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
       : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
   
-  const fetchWithRetry = async (url: string | URL | Request, options: RequestInit | undefined, retries = 1, backoff = 5000) => {
+  const fetchWithRetry = async (url: string, options?: RequestInit, retries = 1, backoff = 5000) => {
     try {
       console.log(`Fetching URL: ${url}`);
       const response = await fetch(url, options);
@@ -139,28 +144,29 @@ export async function fetchGitHubData() {
       }
       return await response.json();
     } catch (error) {
-      console.error('Fetch error:', error);
       if (retries > 0) {
         console.warn(`Retrying... (${retries} attempts left)`);
         await new Promise(resolve => setTimeout(resolve, backoff));
         return fetchWithRetry(url, options, retries - 1, backoff * 2);
-      } else {
-        console.error('Max retries reached. Throwing error.');
-        throw error;
       }
+      throw error;
     }
   };
 
   try {
-    const data = await fetchWithRetry(`${baseUrl}/api/githubData`, undefined);
+    const data = await fetchWithRetry(`${baseUrl}/api/githubData`);
     return {
-      totalCommits: data?.totalCommits || 0,
-      totalRepos: data?.totalRepos || 0,
-      yearsOfExperience: data?.yearsOfExperience || 2
+      totalCommits: data.commits || 0,
+      totalRepos: data.totalRepos || 0,
+      yearsOfExperience: 2 // Hardcoded as it's not from API
     };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
-    return { totalCommits: 0, totalRepos: 0 };
+    return {
+      totalCommits: 0,
+      totalRepos: 0,
+      yearsOfExperience: 2
+    };
   }
 }
 

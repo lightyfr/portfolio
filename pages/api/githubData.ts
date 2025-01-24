@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs/promises';
 import { Octokit } from '@octokit/rest';
+import { siteConfig } from "@/data/githubConfig";
 
 interface CacheData {
   totalCommits: number;
@@ -18,6 +19,11 @@ interface ErrorResponse {
   error: string;
 }
 
+interface GitHubAPIResponse {
+  commits: number;
+  totalRepos: number;
+}
+
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -29,8 +35,9 @@ async function fetchGitHubData(): Promise<{ commits: number, repos: number}> {
   const repos = await octokit.repos.listForAuthenticatedUser();
   let totalCommits = 0;
   
-  const response = await fetch('https://github-contributions-api.deno.dev/lightyfr.text');
+  const response = await fetch(`https://github-contributions-api.deno.dev/${siteConfig.github.username}.txt`);
   const data = await response.text();
+  console.log(data);
   const contributionCount = parseInt(data.split(' ')[0]);
 
   return {
@@ -68,21 +75,31 @@ async function getCachedData(): Promise<CacheData | null> {
   }
 }
 
-export default async function handler(
-  res: NextApiResponse<GitHubData | ErrorResponse>
-) {
+function isCacheExpired(timestamp: number): boolean {
+  return Date.now() - timestamp >= CACHE_DURATION;
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<GitHubAPIResponse | ErrorResponse>) {
   try {
+    // Try to get cached data first
     const cachedData = await getCachedData();
     
-    // Check if cache is valid (less than 1 hour old)
-    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+    if (cachedData) {
+      // If cache exists, start background refresh if expired
+      if (isCacheExpired(cachedData.timestamp)) {
+        refreshCache().catch(err => 
+          console.error('Background cache refresh failed:', err)
+        );
+      }
+      
+      // Return cached data immediately
       return res.status(200).json({
         commits: cachedData.totalCommits,
         totalRepos: cachedData.totalRepos
       });
     }
 
-    // Cache expired or missing, fetch fresh data
+    // No cache exists, must wait for initial fetch
     const newData = await refreshCache();
     return res.status(200).json({
       commits: newData.totalCommits,

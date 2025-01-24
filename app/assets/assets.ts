@@ -1,4 +1,5 @@
-import AvatarMe from "@assets/profile.png";
+import { siteConfig } from "@/data/githubConfig";
+
 import handGif from "@assets/handGif.svg";
 import nextjsIcon from "@assets/nextjs.svg";
 import supabaseLogo from "@assets/supabase-logo.svg";
@@ -63,8 +64,9 @@ import multiplyIcon from "@assets/multiply.svg";
 import instagramIcon from "@assets/instagram.svg";
 import linkedInIcon from "@assets/linkedin.svg";
 import dribbleIcon from "@assets/dribble-icon.svg";
+export const AvatarMe = `https://github.com/${siteConfig.github.username}.png`
+
 export {
-  AvatarMe,
   handGif,
   discord,
   twitter,
