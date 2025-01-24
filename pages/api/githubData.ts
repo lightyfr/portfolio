@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs/promises';
 import { Octokit } from '@octokit/rest';
@@ -7,6 +7,15 @@ interface CacheData {
   totalCommits: number;
   totalRepos: number;
   timestamp: number;
+}
+
+interface GitHubData {
+  commits: number;
+  totalRepos: number;
+}
+
+interface ErrorResponse {
+  error: string;
 }
 
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
@@ -59,7 +68,9 @@ async function getCachedData(): Promise<CacheData | null> {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  res: NextApiResponse<GitHubData | ErrorResponse>
+) {
   try {
     const cachedData = await getCachedData();
     
@@ -67,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
       return res.status(200).json({
         commits: cachedData.totalCommits,
-        repos: cachedData.totalRepos
+        totalRepos: cachedData.totalRepos
       });
     }
 
@@ -75,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const newData = await refreshCache();
     return res.status(200).json({
       commits: newData.totalCommits,
-      repos: newData.totalRepos
+      totalRepos: newData.totalRepos
     });
 
   } catch (error) {
