@@ -14,8 +14,8 @@ export default function ContactPage() {
       <div className="flex flex-col gap-[60px] max-w-[750px] w-[80%] items-center p-[80px_0px]">
         <SectionHeading
           icon={emailIcon}
-          title="I Love to hear from you."
-          description="Connect with Me Today. Let's Create Something Amazing Together!"
+          title="I'd Love to hear from you."
+          description="Connect with Me Now. Let's Create Something Amazing Together!"
         >
           <div className="w-full ">
             <div className="flex  items-start flex-none flex-nowrap  w-full gap-5 h-min justify-start p-0 relative">
@@ -30,7 +30,7 @@ export default function ContactPage() {
         <SectionHeading
           icon={questionMarkIcon}
           title="Common Queries"
-          description="Get Answers to Common Queries. Your Questions, Addressed Simply."
+          description="You got questions, I have answers."
         />
 
         <FAQ data={faqData} />

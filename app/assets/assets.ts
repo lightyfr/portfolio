@@ -1,4 +1,4 @@
-import { siteConfig } from "@/data/userConfig";
+import { profileConfig } from "@/data/userConfig";
 
 import handGif from "@assets/handGif.svg";
 import nextjsIcon from "@assets/nextjs.svg";
@@ -67,10 +67,10 @@ import dribbleIcon from "@assets/dribble-icon.svg";
 
 let AvatarMe: string;
 
-if (siteConfig.linkedinProfilePic == false) {
-  AvatarMe = `https://github.com/${siteConfig.github.username}.png`;
+if (profileConfig.linkedinProfilePic == false) {
+  AvatarMe = `https://github.com/${profileConfig.github.username}.png`;
 } else {
-  AvatarMe = `${siteConfig.linkedin.profileURL}picture`;
+  AvatarMe = `${profileConfig.linkedin.profileURL}picture`;
 }
 
 export { AvatarMe };

@@ -1,5 +1,5 @@
 import { Mail, User, Zap } from "lucide-react";
-import { siteConfig } from "@/data/userConfig";
+import { profileConfig } from "@/data/userConfig";
 import {
   athonLogo,
   layers,
@@ -70,19 +70,19 @@ export const socialLists: socialListsTypes[] = [
     id: 1,
     title: 'LinkedIn',
     icon: <Linkedin size={22} />,
-    link: '${siteConfig.linkedin.profileURL}'
+    link: '${profileConfig.linkedin.profileURL}'
   },
   {
     id: 2,
     title: 'Github',
     icon: <Github size={22} />,
-    link: `https://www.github.com/${siteConfig.github.username}`
+    link: `https://www.github.com/${profileConfig.github.username}`
   },
   {
     id: 3,
     title: 'Email',
     icon: <MailIcon size={22} />,
-    link: "mailto:{siteConfig.github.email}"
+    link: "mailto:{profileConfig.github.email}"
   }
 ]
 
@@ -163,9 +163,9 @@ export async function fetchGitHubData(): Promise<GitHubData> {
   try {
     const data = await fetchWithRetry(`${baseUrl}/api/githubData`);
     return {
-      totalCommits: data.commits || 0,
-      totalRepos: data.totalRepos || 0,
-      totalStars: data.totalStars || 0,
+      totalCommits: data.commits || profileConfig.github.totalCommits,
+      totalRepos: data.totalRepos || profileConfig.github.totalProjects,
+      totalStars: data.totalStars || profileConfig.github.totalStars,
       yearsOfExperience: 2 // Hardcoded as it's not from API
     };
   } catch (error) {
@@ -195,7 +195,7 @@ export const counterLists: counterListsType[] = [
   {
     id: 3,
     title: "Stars",
-    value: githubData.totalStars ?? 0, // Update this manually
+    value: githubData.totalStars ?? profileConfig.github.totalStars, // Update this manually
   },
   {
     id: 4,
@@ -456,7 +456,7 @@ export const faqData: FAQ[] = [
   },
   {
     question: "How long does it typically take to complete a project?",
-    answer: "The timeline for each project varies depending on its scope and complexity. Factors such as the number of pages, functionalities, and the client feedback process can impact the timeline. Upon discussing your project requirements, I will provide you with a realistic timeline and keep you updated throughout the process.",
+    answer: "The timeline for each project varies depending on its scope and complexity. Factors such as the number of pages, functionalities, and the client feedback process can impact the timeline. Upon discussing your project rerrements, I will provide you with a realistic timeline and keep you updated throughout the process.",
   },
   {
     question: "Can you integrate third-party tools into my website?",

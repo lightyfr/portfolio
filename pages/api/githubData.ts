@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs/promises';
 import { Octokit } from '@octokit/rest';
-import { siteConfig } from "@/data/userConfig";
+import { profileConfig } from "@/data/userConfig";
 
 interface CacheData {
   totalCommits: number;
@@ -38,7 +38,7 @@ const memoryCache = new Map<string, CacheData>();
 async function fetchGitHubData(): Promise<{ commits: number, repos: number, totalStars?: number }> {
   const repos = await octokit.repos.listForAuthenticatedUser();
   
-  const response = await fetch(`https://github-contributions-api.deno.dev/${siteConfig.github.username}.txt`);
+  const response = await fetch(`https://github-contributions-api.deno.dev/${profileConfig.github.username}.txt`);
   const data = await response.text();
   console.log(data);
   const contributionCount = parseInt(data.split(' ')[0]);
@@ -120,7 +120,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 }
 
 export async function getGitHubData(): Promise<GitHubData> {
-  const username = siteConfig.github.username;
+  const username = profileConfig.github.username;
   
   // Get user data
   const { data: userData } = await octokit.users.getByUsername({
