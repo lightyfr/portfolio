@@ -1,15 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
-import { promisify } from 'util';
-
-const exists = promisify(fs.exists);
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const stat = promisify(fs.stat);
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
+
+// In-memory cache
+let memoryCache: any = null;
+let memoryCacheTimestamp = 0;
 
 type Commit = {
     sha: string;
@@ -61,11 +59,20 @@ async function fetchAllCommits(repo: string) {
     return commits;
 }
 
+async function fileExists(filePath: string) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function getCachedData() {
-    if (await exists(cachePath)) {
-        const stats = await stat(cachePath);
+    if (await fileExists(cachePath)) {
+        const stats = await fs.stat(cachePath);
         if (Date.now() - stats.mtimeMs < CACHE_DURATION) {
-            return JSON.parse(await readFile(cachePath, 'utf8'));
+            return JSON.parse(await fs.readFile(cachePath, 'utf8'));
         }
     }
     return null;
@@ -76,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Add to handler
         if (req.query.force === 'true') {
             console.log('Forcing cache refresh');
-            await writeFile(cachePath, JSON.stringify({})); // Invalidate cache
+            await fs.writeFile(cachePath, JSON.stringify({})); // Invalidate cache
         }
         // Try to serve cached data first
         const cachedData = await getCachedData();
@@ -120,7 +127,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         };
 
         // Update cache
-        await writeFile(cachePath, JSON.stringify(responseData));
+        await fs.writeFile(cachePath, JSON.stringify(responseData));
         res.status(200).json(responseData);
 
     } catch (error) {
