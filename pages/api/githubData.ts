@@ -12,7 +12,7 @@ const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 
 // In-memory cache
-let memoryCache: CacheData | null = null;
+const memoryCache = new Map();
 
 async function getCachedData(): Promise<CacheData | null> {
   try {
@@ -41,7 +41,7 @@ async function fetchCommitCount(token: string): Promise<number> {
   // Check file cache
   const cachedData = await getCachedData();
   if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
-    memoryCache = cachedData;
+    memoryCache.set('totalCommits', cachedData.totalCommits);
     return cachedData.totalCommits;
   }
 
@@ -57,7 +57,7 @@ async function fetchCommitCount(token: string): Promise<number> {
       totalCommits: contributionCount, timestamp: Date.now(),
       totalRepos: 0
     };
-    memoryCache = newCache;
+    memoryCache.set('totalCommits', contributionCount);
     await writeCacheData(newCache);
 
     return contributionCount;
@@ -93,7 +93,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       timestamp: 0
     };
 
-    memoryCache = responseData;
+    memoryCache.set('totalRepos', totalRepos);
+    memoryCache.set('totalCommits', totalCommits);
     await writeCacheData(responseData);
     res.status(200).json(responseData);
 
