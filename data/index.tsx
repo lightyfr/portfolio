@@ -132,7 +132,7 @@ export async function fetchGitHubData() {
   try {
     const response = await fetch(`${baseUrl}/api/githubData`);
     if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status}`);
+      throw new Error(`GitHub API error: ${response.statusText}`);
     }
     const data = await response.json();
     return {
