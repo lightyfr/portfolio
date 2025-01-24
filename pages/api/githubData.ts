@@ -6,7 +6,7 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 
 // In-memory cache
-let memoryCache: any = null;
+let memoryCache: Commit[] | null = null;
 let memoryCacheTimestamp = 0;
 
 type Commit = {
@@ -22,6 +22,10 @@ type Commit = {
 };
 
 async function fetchAllCommits(repo: string) {
+    if (memoryCache && Date.now() - memoryCacheTimestamp < CACHE_DURATION) {
+        return memoryCache;
+    }
+
     const token = process.env.GITHUB_TOKEN;
     const commits: Commit[] = [];
     const page = 1;
@@ -56,6 +60,9 @@ async function fetchAllCommits(repo: string) {
         
         // ... rest of existing code ...
     }
+
+    memoryCache = commits;
+    memoryCacheTimestamp = Date.now();
     return commits;
 }
 
