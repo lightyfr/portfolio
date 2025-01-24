@@ -1,4 +1,4 @@
-import AvatarMe from "@assets/profile.jpg";
+import AvatarMe from "@assets/profile.png";
 import handGif from "@assets/handGif.svg";
 import nextjsIcon from "@assets/nextjs.svg";
 import supabaseLogo from "@assets/supabase-logo.svg";
