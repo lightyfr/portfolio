@@ -130,7 +130,7 @@ export async function fetchGitHubData() {
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
       : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
   
-  const fetchWithRetry = async (url: string | URL | Request, options: RequestInit | undefined, retries = 2, backoff = 5000) => {
+  const fetchWithRetry = async (url: string | URL | Request, options: RequestInit | undefined, retries = 1, backoff = 5000) => {
     try {
       console.log(`Fetching URL: ${url}`);
       const response = await fetch(url, options);

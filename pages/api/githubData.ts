@@ -34,20 +34,14 @@ async function fetchAllCommits(repo: string) {
     while (hasMore) {
         // In fetchAllCommits function, update the URL construction:
         const response = await fetch(
-            `https://api.github.com/repos/lightyfr/${repo}/commits?${new URLSearchParams({
-                author: 'lightyfr',
-                committer: 'lightyfr',
-                per_page: '100',
-                page: page.toString(),
-            }).toString()}`,
+            'https://api.github.com/search/commits?q=author:lightyfr',
             {
-        headers: {
-            Authorization: `token ${token}`,
-            Accept: 'application/vnd.github.v3+json'
-        }
-    }
-);
-
+                headers: {
+                    Authorization: `token ${token}`,
+                    Accept: 'application/vnd.github.v3+json'
+                }
+            }
+        );
         // Add rate limit handling
         const remaining = parseInt(response.headers.get('x-ratelimit-remaining') || '0');
         if (remaining < 10) {
