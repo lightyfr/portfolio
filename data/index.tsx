@@ -129,12 +129,27 @@ export async function fetchGitHubData() {
   const baseUrl = process.env.NODE_ENV === 'production' 
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
       : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
-  try {
-    const response = await fetch(`${baseUrl}/api/githubData`);
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.statusText}`);
+  
+  const fetchWithRetry = async (url, options, retries = 3, backoff = 3000) => {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      if (retries > 0) {
+        console.warn(`Retrying... (${retries} attempts left)`);
+        await new Promise(resolve => setTimeout(resolve, backoff));
+        return fetchWithRetry(url, options, retries - 1, backoff * 2);
+      } else {
+        throw error;
+      }
     }
-    const data = await response.json();
+  };
+
+  try {
+    const data = await fetchWithRetry(`${baseUrl}/api/githubData`, {});
     return {
       totalCommits: data?.totalCommits || 0,
       totalRepos: data?.totalRepos || 0
