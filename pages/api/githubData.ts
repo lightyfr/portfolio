@@ -32,12 +32,7 @@ async function writeCacheData(data: CacheData): Promise<void> {
   }
 }
 
-async function fetchCommitCount(token: string): Promise<number> {
-  // Check memory cache first
-  //if (memoryCache?.totalCommits && Date.now() - memoryCache.timestamp < CACHE_DURATION) {
-  //  return memoryCache.totalCommits;
-  //}
-
+async function fetchCommitCount(): Promise<number> {
   // Check file cache
   const cachedData = await getCachedData();
   if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
@@ -85,7 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!token) throw new Error('Missing GITHUB_TOKEN');
 
     const totalRepos = await fetchRepoCount(token);
-    const totalCommits = await fetchCommitCount(token);
+    const totalCommits = await fetchCommitCount(); // Remove token parameter
 
     const responseData: CacheData = {
       totalRepos,
