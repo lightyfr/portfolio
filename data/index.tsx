@@ -1,4 +1,5 @@
 import { Mail, User, Zap } from "lucide-react";
+import { siteConfig } from "@/data/userConfig";
 import {
   athonLogo,
   layers,
@@ -69,19 +70,19 @@ export const socialLists: socialListsTypes[] = [
     id: 1,
     title: 'LinkedIn',
     icon: <Linkedin size={22} />,
-    link: 'https://www.linkedin.com/in/adhitya-nadooli-8b83782b4/'
+    link: '${siteConfig.linkdin.profileURL}'
   },
   {
     id: 2,
     title: 'Github',
     icon: <Github size={22} />,
-    link: 'https://www.github.com/lightyfr'
+    link: `https://www.github.com/${siteConfig.github.username}`
   },
   {
     id: 3,
     title: 'Email',
     icon: <MailIcon size={22} />,
-    link: "mailto:adhi.naddi@gmail.com"
+    link: "mailto:{siteConfig.github.email}"
   }
 ]
 

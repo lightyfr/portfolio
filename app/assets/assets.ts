@@ -1,4 +1,4 @@
-import { siteConfig } from "@/data/githubConfig";
+import { siteConfig } from "@/data/userConfig";
 
 import handGif from "@assets/handGif.svg";
 import nextjsIcon from "@assets/nextjs.svg";

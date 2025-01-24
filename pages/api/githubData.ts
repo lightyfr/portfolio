@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import fs from 'fs/promises';
 import { Octokit } from '@octokit/rest';
-import { siteConfig } from "@/data/githubConfig";
+import { siteConfig } from "@/data/userConfig";
 
 interface CacheData {
   totalCommits: number;
