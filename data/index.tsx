@@ -128,11 +128,11 @@ export const socialBrands: socialBrandsTypes[] = [
 export async function fetchGitHubData() {
   const baseUrl = process.env.NODE_ENV === 'production' 
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-      : 'http://localhost:3000';
+      : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
   try {
     const response = await fetch(`${baseUrl}/api/githubData`);
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error(`GitHub API error: ${response.status}`);
     }
     const data = await response.json();
     return {
