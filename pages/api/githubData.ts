@@ -28,7 +28,6 @@ async function fetchAllCommits(repo: string) {
 
     const token = process.env.GITHUB_TOKEN;
     const commits: Commit[] = [];
-    const page = 1;
     let hasMore = true;
 
     while (hasMore) {
@@ -119,6 +118,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }))
         );
 
+        console.log('Fetched data from GitHub', repos);
         // Calculate totals
         const responseData = {
             totalCommits: reposWithCommits.reduce((acc, repo) => acc + repo.commits.length, 0),
