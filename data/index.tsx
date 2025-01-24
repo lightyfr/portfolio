@@ -1,21 +1,23 @@
 import { Mail, User, Zap } from "lucide-react";
 import {
-  asanaIcon,
   athonLogo,
+  layers,
   client_1,
   client_2,
   client_3,
   client_4,
   discord,
   dribble,
+  nodejsIcon,
   dribbleIcon,
+  brushIcon,
+  aiIcon,
   facebook,
   figmaIcon,
-  framerIcon,
   graphicDesignIcon,
   instagramIcon,
+  nextjsIcon,
   linkedInIcon,
-  notionIcon,
   pinterest,
   pixelworksLogo,
   project_1,
@@ -23,20 +25,23 @@ import {
   project_3,
   project_4,
   seoOptIcon,
-  slackIcon,
   snapchat,
   spotify,
   vortexLogo,
   webDesignIcon,
+  supabaseLogo,
   webDevIcon,
-  webflowIcon,
+  electronIcon,
   XLogo,
+  reactIcon,
 } from "@/app/assets/assets";
 import { Github, MailIcon, Linkedin } from 'lucide-react'
 
 import { counterListsType, FAQ, FollowerData, myExperienceTypes, myServicesPlansTypes, myServicesTypes, myShowCasesTypes, myStackTypes, socialBrandsTypes, testimonialsTypes } from "@/types";
 import { socialListsTypes } from '@/types'
 import { pagesListsType } from "@/types";
+
+const BASE_URL = 'http://localhost:3000/services';
 
 export const pagesLists: pagesListsType[] = [
   {
@@ -208,30 +213,30 @@ export const myExperience: myExperienceTypes[] = [
 export const myStack: myStackTypes[] = [
   {
     id: 1,
-    title: "React Native",
+    title: "React / React Native",
     description: "Cross-Platform Mobile Development",
-    logo: figmaIcon,
+    logo: reactIcon,
     link: "https://reactnative.dev",
   },
   {
     id: 2,
     title: "Next.js",
     description: "Modern Web Development Framework",
-    logo: figmaIcon,
+    logo: nextjsIcon,
     link: "https://nextjs.org",
   },
   {
     id: 3,
     title: "Supabase",
     description: "Open-Source Backend-as-a-Service",
-    logo: figmaIcon,
+    logo: supabaseLogo,
     link: "https://supabase.io",
   },
   {
     id: 4,
     title: "Electron",
     description: "Framework for Building Cross-Platform Desktop Apps",
-    logo: figmaIcon,
+    logo: electronIcon,
     link: "https://www.electronjs.org",
   },
   {
@@ -243,10 +248,10 @@ export const myStack: myStackTypes[] = [
   },
   {
     id: 6,
-    title: "AWS",
-    description: "Cloud Computing Services",
-    logo: figmaIcon,
-    link: "https://aws.amazon.com",
+    title: "Node.JS",
+    description: "JavaScript Runtime Environment",
+    logo: nodejsIcon,
+    link: "https://nodejs.org",
   }
 ];
 
@@ -255,29 +260,29 @@ export const myServices: myServicesTypes[] = [
     id: 1,
     title: 'App Development',
     description: 'Building modern, responsive mobile apps that deliver exceptional user experiences.',
-    icon: figmaIcon,
-    link: 'http://localhost:3000/services'
+    icon: layers,
+    link: `${BASE_URL}`
   },
   {
     id: 2,
     title: 'Web Development',
     description: 'Creating scalable and performant web applications with the latest technologies.',
     icon: webDevIcon,
-    link: 'http://localhost:3000/services'
+    link: `${BASE_URL}`
   },
   {
     id: 3,
     title: 'UI/UX Design',
     description: 'Crafting user-friendly interfaces and experiences that elevate digital products.',
-    icon: figmaIcon,
-    link: 'http://localhost:3000/services'
+    icon: brushIcon,
+    link: `${BASE_URL}/`
   },
   {
     id: 4,
     title: 'AI Integration',
     description: 'Implementing AI-driven solutions for smarter, more efficient applications.',
-    icon: figmaIcon,
-    link: 'http://localhost:3000/services'
+    icon: aiIcon,
+    link: `${BASE_URL}`
   }
 ];
 

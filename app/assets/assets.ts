@@ -1,5 +1,13 @@
 import AvatarMe from "@assets/profile.jpg";
 import handGif from "@assets/handGif.svg";
+import nextjsIcon from "@assets/nextjs.svg";
+import supabaseLogo from "@assets/supabase-logo.svg";
+import reactIcon from "@assets/react.svg";
+import electronIcon from "@assets/electron.svg";
+import nodejsIcon from "@assets/node.svg";
+import layers from "@assets/layers.svg";
+import brushIcon from "@assets/brush.svg";
+import aiIcon from "@assets/ai.svg";
 
 import discord from "@assets/discord.svg";
 import dribble from "@assets/dribble.svg";
@@ -103,5 +111,13 @@ export {
   multiplyIcon,
   instagramIcon,
   linkedInIcon,
+  nextjsIcon,
+  supabaseLogo,
+  reactIcon,
+  electronIcon,
   dribbleIcon,
+  nodejsIcon,
+  layers,
+  brushIcon,
+  aiIcon
 };
