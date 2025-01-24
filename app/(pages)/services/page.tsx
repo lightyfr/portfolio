@@ -15,7 +15,7 @@ export default function SearvicesPage() {
       <div className='gap-[60px] flex-col max-w-[750px] w-[80%] flex-nowrap flex items-center flex-none h-min justify-center  relative overflow-visible p-[80px_0px]  ' >
         <SectionHeading icon={zapIcon} title='My Services' description='Formulating comprehensive strategies to meet your design goals and exceed expectations.' />
 
-        <div className="flex-0 w-full gap-[10px] h-min grid justify-center overflow-visible p-0 relative grid-cols-[repeat(2,minmax(50px,1fr))] grid-rows-[repeat(2,min-content)] ">
+        <div className="flex-0 w-full gap-[10px] h-min grid justify-center overflow-visible p-0 relative grid-cols-1 lg:grid-cols-[repeat(2,minmax(50px,1fr))] lg:grid-rows-[repeat(2,min-content)] ">
           {myServicesPlans?.map((plan, index) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -23,7 +23,7 @@ export default function SearvicesPage() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{
                 once: true,
-                amount: 0.5
+                amount: 0.5,
               }}
               className="place-self-start h-auto w-full relative" key={plan.id}>
               <div className="rounded-xl flex flexFlow items-end place-items-end gap-5 h-min p-6 relative border bg-very-dark-gray border-dark-gray-3 ">

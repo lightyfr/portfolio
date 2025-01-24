@@ -6,7 +6,7 @@ import SocialLists from "@/components/Socials/SocialLists";
 import Footer from "@/components/Footer/Footer";
 import { ThemeProvider } from "@/providers/theme-provider";
 import SideNavbar from "@/components/SideNavbar/SideNavbar";
-
+import { Analytics } from "@vercel/analytics/react"
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-Space_Grotesk",
   subsets: ["latin"],
@@ -20,8 +20,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Adhitya Nadooli • Portfolio",
-  description: "Adhitya Nadooli personal portfolio showcasing projects, skills, and experience.",
+  title: "PS Parwez • Portfolio",
+  description: "PS Parwez's personal portfolio showcasing projects, skills, and experience.",
 };
 
 export default function RootLayout({
@@ -39,7 +39,7 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="data-theme"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
@@ -53,6 +53,7 @@ export default function RootLayout({
             <SocialLists />
           </div>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
