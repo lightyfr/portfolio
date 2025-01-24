@@ -24,7 +24,9 @@ export default function CounterContainer() {
 
                                 <div className="flex-none h-auto relative w-auto">
                                     <div className="items-start justify-start text-[28px] font-bold text-very-light-gray ">
-                                        <CountUp end={list.value} />
+                                        <CountUp end={list.value} 
+                                                decimals={Number.isInteger(list.value) ? 0 : 2}
+                                                decimal="." />
                                     </div>
                                 </div>
                                 <div className="flex flex-shrink-0 flex-col justify-start float-none h-auto relative whitespace-pre w-auto">
