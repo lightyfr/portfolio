@@ -11,8 +11,10 @@ interface CacheData {
 }
 
 interface GitHubData {
+  repos: number;
+  stars: number;
   commits: number;
-  totalRepos: number;
+  followers: number;
 }
 
 interface ErrorResponse {
@@ -110,4 +112,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     console.error('Error fetching GitHub data:', error);
     return res.status(500).json({ error: 'Failed to fetch GitHub data' });
   }
+}
+
+export async function getGitHubData(): Promise<GitHubData> {
+  const username = siteConfig.github.username;
+  
+  // Get user data
+  const { data: userData } = await octokit.users.getByUsername({
+    username,
+  });
+
+  // Get repos
+  const { data: repos } = await octokit.repos.listForUser({
+    username,
+    per_page: 100,
+  });
+
+  // Calculate total stars
+  const totalStars = repos.reduce((acc, repo) => acc + (repo.stargazers_count ?? 0), 0);
+
+  // Get total commits across all repos
+  const commits: number[] = await Promise.all(
+    repos.map(async (repo) => {
+      try {
+        const { data: repoCommits } = await octokit.repos.listCommits({
+          owner: username,
+          repo: repo.name,
+          per_page: 1,
+        });
+        return repoCommits[0]?.sha ? 1 : 0;
+      } catch {
+        return 0;
+      }
+    })
+  );
+  const totalCommits = commits.reduce((acc, count) => acc + count, 0);
+
+  return {
+    repos: repos.length,
+    stars: totalStars,
+    commits: totalCommits,
+    followers: userData.followers,
+  };
 }
