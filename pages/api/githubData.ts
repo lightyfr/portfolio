@@ -1,52 +1,82 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { promises as fs } from 'fs';
 import path from 'path';
+import fs from 'fs/promises';
+
+interface CacheData {
+  totalCommits: number;
+  timestamp: number;
+}
 
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 
 // In-memory cache
-const memoryCache: { totalCommits?: number } = {};
-const memoryCacheTimestamp = Date.now();
+let memoryCache: CacheData | null = null;
 
-async function fetchCommitCount(token: string): Promise<number> {
-    // Check memory cache first
-    if (memoryCache.totalCommits && Date.now() - memoryCacheTimestamp < CACHE_DURATION) {
-        return memoryCache.totalCommits;
-    }
-
-    const response = await fetch(
-        'https://api.github.com/search/commits?q=author:lightyfr',
-        {
-            headers: {
-                Authorization: `token ${token}`,
-                Accept: 'application/vnd.github.v3+json'
-            }
-        }
-    );
-
-    const data = await response.json();
-    memoryCache.totalCommits = data.total_count;
-    return data.total_count;
-}
-
-async function fileExists(filePath: string) {
+async function getCachedData(): Promise<CacheData | null> {
   try {
-    await fs.access(filePath);
-    return true;
+    const data = await fs.readFile(cachePath, 'utf-8');
+    return JSON.parse(data);
   } catch {
-    return false;
+    return null;
   }
 }
 
-async function getCachedData() {
-    if (await fileExists(cachePath)) {
-        const stats = await fs.stat(cachePath);
-        if (Date.now() - stats.mtimeMs < CACHE_DURATION) {
-            return JSON.parse(await fs.readFile(cachePath, 'utf8'));
-        }
-    }
-    return null;
+async function writeCacheData(data: CacheData): Promise<void> {
+  try {
+    await fs.mkdir(path.dirname(cachePath), { recursive: true });
+    await fs.writeFile(cachePath, JSON.stringify(data));
+  } catch (error) {
+    console.error('Failed to write cache:', error);
+  }
+}
+
+async function fetchCommitCount(token: string): Promise<number> {
+  // Check memory cache first
+  if (memoryCache?.totalCommits && Date.now() - memoryCache.timestamp < CACHE_DURATION) {
+    return memoryCache.totalCommits;
+  }
+
+  // Check file cache
+  const cachedData = await getCachedData();
+  if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+    memoryCache = cachedData;
+    return cachedData.totalCommits;
+  }
+
+  try {
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          query {
+            viewer {
+              contributionsCollection {
+                totalCommitContributions
+              }
+            }
+          }
+        `
+      }),
+    });
+
+    const data = await response.json();
+    const totalCommits = data.data.viewer.contributionsCollection.totalCommitContributions;
+
+    // Update both caches
+    const newCache: CacheData = { totalCommits, timestamp: Date.now() };
+    memoryCache = newCache;
+    await writeCacheData(newCache);
+
+    return totalCommits;
+  } catch (error) {
+    console.error('Failed to fetch commit count:', error);
+    return cachedData?.totalCommits || 0;
+  }
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -55,12 +85,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!token) throw new Error('Missing GITHUB_TOKEN');
 
         const commitCount = await fetchCommitCount(token);
-        const responseData = {
+        const responseData: CacheData = {
             totalCommits: commitCount,
-            lastUpdated: new Date().toISOString()
+            timestamp: Date.now()
         };
 
-        await fs.writeFile(cachePath, JSON.stringify(responseData));
+        await writeCacheData(responseData);
         res.status(200).json(responseData);
     } catch (error) {
         console.error(error);
