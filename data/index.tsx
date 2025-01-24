@@ -139,6 +139,7 @@ export async function fetchGitHubData() {
       }
       return await response.json();
     } catch (error) {
+      console.error('Fetch error:', error);
       if (retries > 0) {
         console.warn(`Retrying... (${retries} attempts left)`);
         await new Promise(resolve => setTimeout(resolve, backoff));
