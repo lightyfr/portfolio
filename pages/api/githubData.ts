@@ -2,12 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 
 // In-memory cache
-let memoryCache: Commit[] | null = null;
-let memoryCacheTimestamp = 0;
+const memoryCache: { totalCommits?: number } = {};
+const memoryCacheTimestamp = Date.now();
 
 type Commit = {
     sha: string;
@@ -21,8 +21,12 @@ type Commit = {
     };
 };
 
-// Replace fetchAllCommits function with:
 async function fetchCommitCount(token: string): Promise<number> {
+    // Check memory cache first
+    if (memoryCache.totalCommits && Date.now() - memoryCacheTimestamp < CACHE_DURATION) {
+        return memoryCache.totalCommits;
+    }
+
     const response = await fetch(
         'https://api.github.com/search/commits?q=author:lightyfr',
         {
@@ -39,6 +43,7 @@ async function fetchCommitCount(token: string): Promise<number> {
     }
 
     const data = await response.json();
+    memoryCache.totalCommits = data.total_count;
     return data.total_count;
 }
 
@@ -78,8 +83,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const token = process.env.GITHUB_TOKEN;
         if (!token) throw new Error('Missing GITHUB_TOKEN');
 
+        const commitCount = await fetchCommitCount(token);
         const responseData = {
-            totalCommits: await fetchCommitCount(token),
+            totalCommits: commitCount,
             lastUpdated: new Date().toISOString()
         };
 
