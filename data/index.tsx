@@ -147,6 +147,7 @@ export async function fetchGitHubData(): Promise<GitHubData> {
       const text = await response.text();
       try {
         return JSON.parse(text);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         throw new Error('Invalid JSON response');
       }
@@ -171,9 +172,9 @@ export async function fetchGitHubData(): Promise<GitHubData> {
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
     return {
-      totalCommits: 0,
-      totalStars: 0,
-      totalRepos: 0,
+      totalCommits: profileConfig.github.totalCommits,
+      totalStars: profileConfig.github.totalStars,
+      totalRepos: profileConfig.github.totalProjects,
       yearsOfExperience: 2
     };
   }
