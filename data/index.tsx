@@ -127,7 +127,7 @@ export const socialBrands: socialBrandsTypes[] = [
 // Update the fetchGitHubData function
 export async function fetchGitHubData() {
   const baseUrl = process.env.NODE_ENV === 'production' 
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
+      ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
       : 'http://localhost:3000';
   try {
     const response = await fetch(`${baseUrl}/api/githubData`);
