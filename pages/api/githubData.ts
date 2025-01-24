@@ -9,18 +9,6 @@ const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 const memoryCache: { totalCommits?: number } = {};
 const memoryCacheTimestamp = Date.now();
 
-type Commit = {
-    sha: string;
-    commit: {
-        author: {
-            name: string;
-            email: string;
-            date: string;
-        };
-        message: string;
-    };
-};
-
 async function fetchCommitCount(token: string): Promise<number> {
     // Check memory cache first
     if (memoryCache.totalCommits && Date.now() - memoryCacheTimestamp < CACHE_DURATION) {
@@ -36,11 +24,6 @@ async function fetchCommitCount(token: string): Promise<number> {
             }
         }
     );
-
-    const remaining = parseInt(response.headers.get('x-ratelimit-remaining') || '0');
-    if (remaining < 10) {
-        await new Promise(resolve => setTimeout(resolve, 60000));
-    }
 
     const data = await response.json();
     memoryCache.totalCommits = data.total_count;
@@ -68,18 +51,6 @@ async function getCachedData() {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        // Add to handler
-        if (req.query.force === 'true') {
-            console.log('Forcing cache refresh');
-            await fs.writeFile(cachePath, JSON.stringify({})); // Invalidate cache
-        }
-        // Try to serve cached data first
-        const cachedData = await getCachedData();
-        if (cachedData) {
-            return res.status(200).json(cachedData);
-        }
-
-        // Fetch fresh data if cache is expired
         const token = process.env.GITHUB_TOKEN;
         if (!token) throw new Error('Missing GITHUB_TOKEN');
 
@@ -89,15 +60,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             lastUpdated: new Date().toISOString()
         };
 
-        // Update cache
         await fs.writeFile(cachePath, JSON.stringify(responseData));
         res.status(200).json(responseData);
-
     } catch (error) {
-        console.error('API Error:', error);
-        res.status(500).json({ 
-            error: 'Failed to fetch GitHub data',
-            details: error instanceof Error ? error.message : 'Unknown error'
-        });
+        console.error(error);
+        res.status(500).json({ error: 'Failed to fetch GitHub data' });
     }
 }
