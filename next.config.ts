@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'github.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.linkedin.com',
+        pathname: '/**',
+      },
     ],
   }
 };

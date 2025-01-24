@@ -64,8 +64,16 @@ import multiplyIcon from "@assets/multiply.svg";
 import instagramIcon from "@assets/instagram.svg";
 import linkedInIcon from "@assets/linkedin.svg";
 import dribbleIcon from "@assets/dribble-icon.svg";
-export const AvatarMe = `https://github.com/${siteConfig.github.username}.png`
 
+let AvatarMe: string;
+
+if (siteConfig.linkedinProfilePic == false) {
+  AvatarMe = `https://github.com/${siteConfig.github.username}.png`;
+} else {
+  AvatarMe = `${siteConfig.linkedin.profileURL}picture`;
+}
+
+export { AvatarMe };
 export {
   handGif,
   discord,

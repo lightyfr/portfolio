@@ -70,7 +70,7 @@ export const socialLists: socialListsTypes[] = [
     id: 1,
     title: 'LinkedIn',
     icon: <Linkedin size={22} />,
-    link: '${siteConfig.linkdin.profileURL}'
+    link: '${siteConfig.linkedin.profileURL}'
   },
   {
     id: 2,
@@ -129,12 +129,13 @@ interface GitHubData {
   totalCommits: number;
   totalRepos: number;
   yearsOfExperience: number;
+  totalStars?: number;
 }
 
 export async function fetchGitHubData(): Promise<GitHubData> {
   const baseUrl = process.env.NODE_ENV === 'production' 
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-      : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
+      : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev';
   
   const fetchWithRetry = async (url: string, options?: RequestInit, retries = 1, backoff = 5000) => {
     try {
@@ -143,7 +144,12 @@ export async function fetchGitHubData(): Promise<GitHubData> {
       if (!response.ok) {
         throw new Error(`GitHub API error: ${response.statusText}`);
       }
-      return await response.json();
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        throw new Error('Invalid JSON response');
+      }
     } catch (error) {
       if (retries > 0) {
         console.warn(`Retrying... (${retries} attempts left)`);
@@ -159,12 +165,14 @@ export async function fetchGitHubData(): Promise<GitHubData> {
     return {
       totalCommits: data.commits || 0,
       totalRepos: data.totalRepos || 0,
+      totalStars: data.totalStars || 0,
       yearsOfExperience: 2 // Hardcoded as it's not from API
     };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
     return {
       totalCommits: 0,
+      totalStars: 0,
       totalRepos: 0,
       yearsOfExperience: 2
     };
@@ -176,21 +184,26 @@ const githubData = await fetchGitHubData();
 export const counterLists: counterListsType[] = [
   {
     id: 1,
-    title: "Contribs This Year",
+    title: "Total Contribs",
     value: githubData.totalCommits,
   },
   {
-    id: 2,
+    id : 2,
     title: "Years of Experience",
-    value: githubData.yearsOfExperience, // Update this manually
+    value: githubData.yearsOfExperience,
   },
   {
     id: 3,
-    title: "Completed Projects",
-    value: githubData.totalRepos,
+    title: "Stars",
+    value: githubData.totalStars ?? 0, // Update this manually
   },
   {
     id: 4,
+    title: "Projects",
+    value: githubData.totalRepos,
+  },
+  {
+    id: 5,
     title: "Highschool GPA",
     value: 4.28,
   },

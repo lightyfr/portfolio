@@ -7,6 +7,7 @@ import { siteConfig } from "@/data/userConfig";
 interface CacheData {
   totalCommits: number;
   totalRepos: number;
+  totalStars?: number;
   timestamp: number;
 }
 
@@ -22,6 +23,7 @@ interface ErrorResponse {
 }
 
 interface GitHubAPIResponse {
+  totalStars?: number;
   commits: number;
   totalRepos: number;
 }
@@ -33,9 +35,8 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 // In-memory cache
 const memoryCache = new Map<string, CacheData>();
 
-async function fetchGitHubData(): Promise<{ commits: number, repos: number}> {
+async function fetchGitHubData(): Promise<{ commits: number, repos: number, totalStars?: number }> {
   const repos = await octokit.repos.listForAuthenticatedUser();
-  let totalCommits = 0;
   
   const response = await fetch(`https://github-contributions-api.deno.dev/${siteConfig.github.username}.txt`);
   const data = await response.text();
@@ -44,14 +45,16 @@ async function fetchGitHubData(): Promise<{ commits: number, repos: number}> {
 
   return {
     commits: contributionCount,
+    totalStars: repos.data.reduce((acc, repo) => acc + (repo.stargazers_count ?? 0), 0),
     repos: repos.data.length,
   };
 }
 
 async function refreshCache(): Promise<CacheData> {
-  const { commits, repos } = await fetchGitHubData();
+  const { commits, repos, totalStars } = await fetchGitHubData();
   const newData: CacheData = {
     totalCommits: commits,
+    totalStars: totalStars,
     totalRepos: repos,
     timestamp: Date.now()
   };
@@ -85,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   try {
     // Try to get cached data first
     const cachedData = await getCachedData();
-    
+
     if (cachedData) {
       // If cache exists, start background refresh if expired
       if (isCacheExpired(cachedData.timestamp)) {
@@ -97,6 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       // Return cached data immediately
       return res.status(200).json({
         commits: cachedData.totalCommits,
+        totalStars: cachedData.totalStars,
         totalRepos: cachedData.totalRepos
       });
     }
@@ -104,6 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // No cache exists, must wait for initial fetch
     const newData = await refreshCache();
     return res.status(200).json({
+      totalStars: newData.totalStars,
       commits: newData.totalCommits,
       totalRepos: newData.totalRepos
     });
