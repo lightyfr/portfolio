@@ -130,8 +130,9 @@ export async function fetchGitHubData() {
       ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
       : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev/';
   
-  const fetchWithRetry = async (url: string | URL | Request, options: RequestInit | undefined, retries = 3, backoff = 3000) => {
+  const fetchWithRetry = async (url: string | URL | Request, options: RequestInit | undefined, retries = 5, backoff = 5000) => {
     try {
+      console.log(`Fetching URL: ${url}`);
       const response = await fetch(url, options);
       if (!response.ok) {
         throw new Error(`GitHub API error: ${response.statusText}`);
@@ -143,13 +144,14 @@ export async function fetchGitHubData() {
         await new Promise(resolve => setTimeout(resolve, backoff));
         return fetchWithRetry(url, options, retries - 1, backoff * 2);
       } else {
+        console.error('Max retries reached. Throwing error.');
         throw error;
       }
     }
   };
 
   try {
-    const data = await fetchWithRetry(`${baseUrl}/api/githubData`, {});
+    const data = await fetchWithRetry(`${baseUrl}/api/githubData`, undefined);
     return {
       totalCommits: data?.totalCommits || 0,
       totalRepos: data?.totalRepos || 0
