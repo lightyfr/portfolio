@@ -11,10 +11,22 @@ const stat = promisify(fs.stat);
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 const cachePath = path.join(process.cwd(), 'data', 'github-cache.json');
 
+type Commit = {
+    sha: string;
+    commit: {
+        author: {
+            name: string;
+            email: string;
+            date: string;
+        };
+        message: string;
+    };
+};
+
 async function fetchAllCommits(repo: string) {
     const token = process.env.GITHUB_TOKEN;
-    let commits = [];
-    let page = 1;
+    const commits: Commit[] = [];
+    const page = 1;
     let hasMore = true;
 
     while (hasMore) {
@@ -24,7 +36,6 @@ async function fetchAllCommits(repo: string) {
                 committer: 'lightyfr', // Add committer filter
                 per_page: '100', // Max allowed
                 page: page.toString(),
-                sha: repo.default_branch // Only main branch
             }),
             {
                 headers: {
@@ -86,13 +97,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const repos = await reposResponse.json();
-        const filteredRepos = repos.filter((repo: any) => 
+        const filteredRepos = repos.filter((repo: { fork: boolean; owner: { login: string; }; }) => 
             !repo.fork && repo.owner.login === 'lightyfr'
         );
 
         // Fetch commits for all repositories in parallel
         const reposWithCommits = await Promise.all(
-            filteredRepos.map(async (repo: any) => ({
+            filteredRepos.map(async (repo: { name: string; private: boolean; }) => ({
                 name: repo.name,
                 commits: await fetchAllCommits(repo.name),
                 private: repo.private
