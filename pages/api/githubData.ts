@@ -21,42 +21,25 @@ type Commit = {
     };
 };
 
-async function fetchAllCommits(repo: string) {
-    if (memoryCache && Date.now() - memoryCacheTimestamp < CACHE_DURATION) {
-        return memoryCache;
-    }
-
-    const token = process.env.GITHUB_TOKEN;
-    const commits: Commit[] = [];
-    let hasMore = true;
-
-    while (hasMore) {
-        // In fetchAllCommits function, update the URL construction:
-        const response = await fetch(
-            'https://api.github.com/search/commits?q=author:lightyfr',
-            {
-                headers: {
-                    Authorization: `token ${token}`,
-                    Accept: 'application/vnd.github.v3+json'
-                }
+// Replace fetchAllCommits function with:
+async function fetchCommitCount(token: string): Promise<number> {
+    const response = await fetch(
+        'https://api.github.com/search/commits?q=author:lightyfr',
+        {
+            headers: {
+                Authorization: `token ${token}`,
+                Accept: 'application/vnd.github.v3+json'
             }
-        );
-        // Add rate limit handling
-        const remaining = parseInt(response.headers.get('x-ratelimit-remaining') || '0');
-        if (remaining < 10) {
-            await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 1 min
         }
+    );
 
-        // Handle pagination
-        const linkHeader = response.headers.get('Link');
-        hasMore = linkHeader?.includes('rel="next"') ?? false;
-        
-        // ... rest of existing code ...
+    const remaining = parseInt(response.headers.get('x-ratelimit-remaining') || '0');
+    if (remaining < 10) {
+        await new Promise(resolve => setTimeout(resolve, 60000));
     }
 
-    memoryCache = commits;
-    memoryCacheTimestamp = Date.now();
-    return commits;
+    const data = await response.json();
+    return data.total_count;
 }
 
 async function fileExists(filePath: string) {
@@ -93,38 +76,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Fetch fresh data if cache is expired
         const token = process.env.GITHUB_TOKEN;
-        const reposResponse = await fetch('https://api.github.com/user/repos?per_page=100', {
-            headers: {
-                Authorization: `token ${token}`,
-                Accept: 'application/vnd.github.v3+json'
-            }
-        });
+        if (!token) throw new Error('Missing GITHUB_TOKEN');
 
-        if (!reposResponse.ok) {
-            throw new Error(`GitHub API error: ${reposResponse.status}`);
-        }
-
-        const repos = await reposResponse.json();
-        const filteredRepos = repos.filter((repo: { fork: boolean; owner: { login: string; }; }) => 
-            !repo.fork && repo.owner.login === 'lightyfr'
-        );
-
-        // Fetch commits for all repositories in parallel
-        const reposWithCommits = await Promise.all(
-            filteredRepos.map(async (repo: { name: string; private: boolean; }) => ({
-                name: repo.name,
-                commits: await fetchAllCommits(repo.name),
-                private: repo.private
-            }))
-        );
-
-        console.log('Fetched data from GitHub', repos);
-        // Calculate totals
         const responseData = {
-            totalCommits: reposWithCommits.reduce((acc, repo) => acc + repo.commits.length, 0),
-            totalRepos: filteredRepos.length,
-            lastUpdated: new Date().toISOString(),
-            repos: reposWithCommits
+            totalCommits: await fetchCommitCount(token),
+            lastUpdated: new Date().toISOString()
         };
 
         // Update cache
