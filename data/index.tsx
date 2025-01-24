@@ -119,6 +119,7 @@ export const socialBrands: socialBrandsTypes[] = [
   },
 ];
 
+// Update the fetchGitHubData function
 export async function fetchGitHubData() {
   try {
     const response = await fetch('/api/githubData');
@@ -126,10 +127,13 @@ export async function fetchGitHubData() {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
-    return data;
+    return {
+      totalCommits: data?.totalCommits || 0,
+      totalRepos: data?.totalRepos || 0
+    };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
-    throw error;
+    return { totalCommits: 0, totalRepos: 0 };
   }
 }
 
@@ -139,17 +143,17 @@ export const counterLists: counterListsType[] = [
   {
     id: 1,
     title: "Commits This Year",
-    value: githubData.reduce((acc, repo) => acc + repo.commits.length, 0),
+    value: githubData.totalCommits,
   },
   {
     id: 2,
     title: "Years of Experience",
-    value: githubData.yearsOfExperience,
+    value: 3, // Update this manually
   },
   {
     id: 3,
     title: "Completed Projects",
-    value: githubData.completedProjects,
+    value: githubData.totalRepos,
   },
   {
     id: 4,
