@@ -60,19 +60,26 @@ async function getCachedData(): Promise<CacheData | null> {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Get cached data first
-  const cachedData = await getCachedData();
-
-  if (cachedData) {
-    const freshData = await refreshCache();
-    // Trigger background refresh if stale
-    if (Date.now() - cachedData.timestamp > CACHE_DURATION) {
-      refreshCache().catch(console.error);
+  try {
+    const cachedData = await getCachedData();
+    
+    // Check if cache is valid (less than 1 hour old)
+    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+      return res.status(200).json({
+        commits: cachedData.totalCommits,
+        repos: cachedData.totalRepos
+      });
     }
-    return res.status(200).json(cachedData);
-  }
 
-  // If no cache exists, wait for fresh data
-  const freshData = await refreshCache();
-  return res.status(200).json(freshData);
+    // Cache expired or missing, fetch fresh data
+    const newData = await refreshCache();
+    return res.status(200).json({
+      commits: newData.totalCommits,
+      repos: newData.totalRepos
+    });
+
+  } catch (error) {
+    console.error('Error fetching GitHub data:', error);
+    return res.status(500).json({ error: 'Failed to fetch GitHub data' });
+  }
 }
