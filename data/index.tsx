@@ -119,60 +119,17 @@ export const socialBrands: socialBrandsTypes[] = [
   },
 ];
 
-
-import { Octokit } from "@octokit/rest";
-
-const octokit = new Octokit({
-  auth: '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',
-});
-
-async function fetchGitHubData() {
+export async function fetchGitHubData() {
   try {
-    let repos;
-
-    try {
-      repos = await octokit.repos.listForAuthenticatedUser({
-        visibility: 'all',
-      });
-    } catch (error) {
-      console.error('Error fetching GitHub data:', error);
+    const response = await fetch('/api/githubData');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-
-    let totalCommits = 0;
-
-
-
-    for (const repo of repos.data) {
-      console.log(`Fetching commits for repo: ${repo.name}`);
-      try {
-        const { data: commits } = await octokit.repos.listCommits({
-          owner: "lightyfr",
-          repo: repo.name,
-
-          per_page: 100,
-        });
-        totalCommits += commits.length;
-      } catch (commitError) {
-        console.error(`Error fetching commits for repo: ${repo.name}`, commitError);
-      }
-    }
-
-    const { data: user } = await octokit.users.getAuthenticated();
-
-    return {
-      commitsThisYear: totalCommits,
-      yearsOfExperience: new Date().getFullYear() - new Date(user.created_at).getFullYear(),
-      completedProjects: repos.data.length,
-      awardsReceived: 6, // This would need to be manually updated or fetched from another source
-    };
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Error fetching GitHub data:", error);
-    return {
-      commitsThisYear: 0,
-      yearsOfExperience: 0,
-      completedProjects: 0,
-      awardsReceived: 0,
-    };
+    console.error('Error fetching GitHub data:', error);
+    throw error;
   }
 }
 
@@ -182,7 +139,7 @@ export const counterLists: counterListsType[] = [
   {
     id: 1,
     title: "Commits This Year",
-    value: githubData.commitsThisYear,
+    value: githubData.reduce((acc, repo) => acc + repo.commits.length, 0),
   },
   {
     id: 2,
@@ -196,8 +153,8 @@ export const counterLists: counterListsType[] = [
   },
   {
     id: 4,
-    title: "Awards Received",
-    value: githubData.awardsReceived,
+    title: "Highschool GPA",
+    value: 4.28,
   },
 ];
 
@@ -362,7 +319,6 @@ export const myShowCases: myShowCasesTypes[] = [
     image: project_4,
   }
 ];
-
 
 export const testimonials: testimonialsTypes[] = [
   {
