@@ -159,10 +159,10 @@ export async function fetchGitHubData(): Promise<GitHubData> {
   try {
     const data = await fetchWithRetry(`${baseUrl}/api`);
     return {
-      totalCommits: data.commits || profileConfig.github.totalCommits,
-      totalRepos: data.totalRepos || profileConfig.github.totalProjects,
-      totalStars: data.totalStars || profileConfig.github.totalStars,
-      yearsOfExperience: 2
+      totalCommits: profileConfig.github.overideAutoStats ? profileConfig.github.totalCommits : (data.commits || profileConfig.github.totalCommits),
+      totalRepos: profileConfig.github.overideAutoStats ? profileConfig.github.totalProjects : (data.totalRepos || profileConfig.github.totalProjects),
+      totalStars: profileConfig.github.overideAutoStats ? profileConfig.github.totalStars : (data.totalStars || profileConfig.github.totalStars),
+      yearsOfExperience: profileConfig.github.overideAutoStats ? profileConfig.github.yearsOfExperience : 2
     };
   } catch (error) {
     console.error('Failed to fetch GitHub data:', error);

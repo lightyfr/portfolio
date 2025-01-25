@@ -8,9 +8,9 @@ export const profileConfig = {
       overideAutoStats: false, // Set to true to manually enter your total commits and stars below
       
       // These stats also show when api fails
-      totalCommits: 0, // Replace with your total commits count
-      totalStars: 0, // Replace with your total stars count
-      yearsOfExperience: 1,
+      totalCommits: 642, // Replace with your total commits count
+      totalStars: 1, // Replace with your total stars count
+      yearsOfExperience: 2,
       totalProjects: 9, // Replace with your years of experience
     },
 
