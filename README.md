@@ -4,6 +4,9 @@ Easily create a stunning developer portfolio in minutes! Fork this repository, c
 ---
 THIS IS A FORK OF [PSPARWEZ's PORTFOLIO](https://github.com/psparwez/portfolio)
 ___
+![Screenshot 2025-01-24 202148](https://github.com/user-attachments/assets/4eb5ad62-2018-4f61-b538-cee284b8f40d)
+
+
 ### ✨ Features:
 
 - Modern Design: Sleek, responsive, and visually appealing layout with animations.
