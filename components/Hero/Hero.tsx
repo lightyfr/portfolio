@@ -4,7 +4,7 @@ import Image from 'next/image'
 import React from 'react'
 import { Calendar1, Mail, } from 'lucide-react'
 import Button from '../ui/Button'
-
+import { profileConfig } from '@/data/userConfig'
 import { motion } from "framer-motion"
 import AnimatedImageGrid from '../ui/AnimatedImageGrid'
 import Brandcontainer from '../Brandcontainer/Brandcontainer'
@@ -49,7 +49,7 @@ export default function Hero() {
                             transition={{ duration: 0.5, type: "spring", stiffness: 100, delay: 0.2 }}
                             viewport={{ once: true }}
                             className="text-4xl leading-[1.2em] font-bold text-white">
-                            Adhitya Nadooli
+                            {profileConfig.name}
                         </motion.h1>
                     </div>
 
@@ -62,7 +62,7 @@ export default function Hero() {
                         transition={{ duration: 0.5, type: "spring", stiffness: 100, delay: 0.3 }}
                         viewport={{ once: true }}
                         className="text-[18px] text-light-gray-2 font-medium leading-[150%] mb-4">
-                        Full stack developer, UI/UX designer, and a high school junior that has a love for rapidly learning new and modern technologies.
+                        {profileConfig.description}
                     </motion.p>
 
                     <motion.div

@@ -70,7 +70,7 @@ export const socialLists: socialListsTypes[] = [
     id: 1,
     title: 'LinkedIn',
     icon: <Linkedin size={22} />,
-    link: '${profileConfig.linkedin.profileURL}'
+    link: `${profileConfig.linkedin.profileURL}`
   },
   {
     id: 2,
@@ -82,7 +82,7 @@ export const socialLists: socialListsTypes[] = [
     id: 3,
     title: 'Email',
     icon: <MailIcon size={22} />,
-    link: "mailto:{profileConfig.github.email}"
+    link: `mailto:${profileConfig.email}`
   }
 ]
 

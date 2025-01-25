@@ -7,6 +7,8 @@ import Footer from "@/components/Footer/Footer";
 import { ThemeProvider } from "@/providers/theme-provider";
 import SideNavbar from "@/components/SideNavbar/SideNavbar";
 import { Analytics } from "@vercel/analytics/react"
+import { profileConfig } from '../data/userConfig';
+
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-Space_Grotesk",
   subsets: ["latin"],
@@ -20,8 +22,8 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Adhitya Nadooli • Portfolio",
-  description: "Adhitya Nadooli's personal portfolio showcasing projects, skills, and experience.",
+  title: `${profileConfig.name} • Portfolio`,
+  description: profileConfig.description,
 };
 
 export default function RootLayout({

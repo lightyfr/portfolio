@@ -1,5 +1,6 @@
 import React from 'react'
 import ThemeSwitcher from '../ui/ThemeSwitcher'
+import { profileConfig } from './../../data/userConfig';
 
 export default function Footer() {
     return (
@@ -9,7 +10,7 @@ export default function Footer() {
                 <div className="w-[80%] flex flex-nowrap flex-none h-min justify-center overflow-hidden p-0 relative ">
                     <div className="flex-shrink-0 flex justify-start flex-1 relative break-words whitespace-pre-wrap h-auto ">
                         <p className='text-lg text-light-gray-2 font-medium'>
-                            &copy; {new Date().getFullYear()} Adhitya Nadooli. All rights reserved.
+                            &copy; {new Date().getFullYear()} {profileConfig.name}. All rights reserved.
                         </p>
                     </div>
 

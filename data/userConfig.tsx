@@ -1,5 +1,9 @@
 export const profileConfig = {
 
+  name: "Adhitya Nadooli",
+  description: "Full stack developer, UI/UX designer, and a high school junior that has a love for rapidly learning new and modern technologies.",
+  email: "adhi.naddi@gmail.com",
+  
   // If you want custom src set this to true and change linkedinProfilePic
   linkedinProfilePic: false,
 
