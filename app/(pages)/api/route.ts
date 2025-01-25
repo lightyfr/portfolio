@@ -3,6 +3,7 @@ import { Octokit } from '@octokit/rest';
 import { profileConfig } from "@/data/userConfig";
 import path from 'path';
 import fs from 'fs/promises';
+import os from 'os'; // Add OS module import
 
 interface CacheData {
   totalCommits: number;
@@ -11,12 +12,12 @@ interface CacheData {
   timestamp: number;
 }
 
-const CACHE_DURATION = 3600000; // 1 hour
+const CACHE_DURATION = 3600000;
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-// Serverless-friendly cache implementation
+// Updated to use system temp directory
 const getCachePath = () => 
-  path.join(process.cwd(), 'tmp', 'github-cache.json');
+  path.join(os.tmpdir(), 'github-cache.json'); // Changed from process.cwd()
 
 async function fetchGitHubData() {
   try {
@@ -61,6 +62,7 @@ async function readCache(): Promise<CacheData | null> {
 async function writeCache(data: CacheData) {
   try {
     const cachePath = getCachePath();
+    // Ensure directory exists (though os.tmpdir() should always exist)
     await fs.mkdir(path.dirname(cachePath), { recursive: true });
     await fs.writeFile(cachePath, JSON.stringify(data));
   } catch (error) {

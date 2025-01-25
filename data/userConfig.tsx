@@ -6,6 +6,7 @@ export const profileConfig = {
       email: "adhi.naddi@gmail.com",
 
       overideAutoStats: false, // Set to true to manually enter your total commits and stars below
+      
       // These stats also show when api fails
       totalCommits: 0, // Replace with your total commits count
       totalStars: 0, // Replace with your total stars count
