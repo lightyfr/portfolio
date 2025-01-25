@@ -1,23 +1,10 @@
 import { NextResponse } from 'next/server';
 import { Octokit } from '@octokit/rest';
 import { profileConfig } from "@/data/userConfig";
-import path from 'path';
-import fs from 'fs/promises';
-import os from 'os'; // Add OS module import
-
-interface CacheData {
-  totalCommits: number;
-  totalRepos: number;
-  totalStars?: number;
-  timestamp: number;
-}
 
 const CACHE_DURATION = 3600000;
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
-// Updated to use system temp directory
-const getCachePath = () => 
-  path.join(os.tmpdir(), 'github-cache.json'); // Changed from process.cwd()
 
 async function fetchGitHubData() {
   try {
@@ -48,71 +35,21 @@ async function fetchGitHubData() {
   }
 }
 
-async function readCache(): Promise<CacheData | null> {
-  try {
-    const cachePath = getCachePath();
-    const data = await fs.readFile(cachePath, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Cache read error:', error);
-    return null;
-  }
-}
-
-async function writeCache(data: CacheData) {
-  try {
-    const cachePath = getCachePath();
-    // Ensure directory exists (though os.tmpdir() should always exist)
-    await fs.mkdir(path.dirname(cachePath), { recursive: true });
-    await fs.writeFile(cachePath, JSON.stringify(data));
-  } catch (error) {
-    console.error('Cache write error:', error);
-  }
-}
-
-function isCacheValid(cache: CacheData): boolean {
-  return Date.now() - cache.timestamp < CACHE_DURATION;
-}
-
 export async function GET() {
   try {
-    // Try to read cache
-    const cache = await readCache();
+    const data = await fetchGitHubData();
     
-    // Serve cached data if valid
-    if (cache && isCacheValid(cache)) {
-      return NextResponse.json({
-        commits: cache.totalCommits,
-        totalStars: cache.totalStars,
-        totalRepos: cache.totalRepos
-      });
-    }
-
-    // Fetch fresh data
-    const { commits, totalStars, repos } = await fetchGitHubData();
-    
-    // Create new cache
-    const newCache = {
-      totalCommits: commits,
-      totalStars,
-      totalRepos: repos,
-      timestamp: Date.now()
-    };
-
-    // Write cache in background
-    writeCache(newCache).catch(console.error);
-
-    return NextResponse.json({
-      commits: newCache.totalCommits,
-      totalStars: newCache.totalStars,
-      totalRepos: newCache.totalRepos
+    return new NextResponse(JSON.stringify(data), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=300`
+      }
     });
-
   } catch (error) {
     console.error('Failed to fetch GitHub data:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch GitHub data' },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: 'Failed to fetch GitHub data' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }

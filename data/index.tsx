@@ -156,17 +156,8 @@ export async function fetchGitHubData(): Promise<GitHubData> {
     }
   };
 
-  if (profileConfig.github.overideAutoStats) {
-    return {
-      totalCommits: profileConfig.github.totalCommits,
-      totalRepos: profileConfig.github.totalProjects,
-      totalStars: profileConfig.github.totalStars,
-      yearsOfExperience: 2
-    };
-  }
-
   try {
-    const data = await fetchWithRetry(`${baseUrl}/api/githubData`);
+    const data = await fetchWithRetry(`${baseUrl}/api`);
     return {
       totalCommits: data.commits || profileConfig.github.totalCommits,
       totalRepos: data.totalRepos || profileConfig.github.totalProjects,
