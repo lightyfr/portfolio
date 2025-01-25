@@ -1,36 +1,37 @@
-### 🚀 Portfolio Maker
-Create a stunning developer portfolio in minutes! Just fork this repo, customize a single config file, and deploy your personalized portfolio website.
+# 🚀 Portfolio Maker
+Easily create a stunning developer portfolio in minutes! Fork this repository, customize a single config file, and deploy your personalized portfolio website effortlessly.
 
+---
+THIS IS A FORK OF [PSPARWEZ's PORTFOLIO](https://github.com/psparwez/portfolio)
 ___
 ### ✨ Features:
 
- - Responsive & modern design and animations
-
- - Pre-built sections (Projects, Skills, Experience)
-
- - Easy customization via userConfig.tsx
-
- - Dark/light mode toggle
-
- - Built with Next.js
-
-- Deploy anywhere (Vercel, Netlify, GitHub Pages)
+- Modern Design: Sleek, responsive, and visually appealing layout with animations.
+- Pre-Built Sections: Showcase your projects, skills, and experience effortlessly.
+- Easy Customization: Modify all settings using the userConfig.tsx file.
+- Dark/Light Mode: Toggle between themes to match your preference.
+- Built with Next.js: Leverage the power and flexibility of Next.js.
+- Deploy Anywhere: Supports Vercel, Netlify, GitHub Pages, and more.
 
 ### 🛠️ Quick Start:
+---
+1. Fork this repository
+Create your copy by forking this repository.
 
-Fork this repository
+2. Edit Configuration
+Update the `userConfig.tsx` file with your personal details.
 
-- Edit userConfig.tsx with your details
+3. Set Up Environment Variables
 
-- Create a .env file at the project root
+- `NEXT_PUBLIC_VERCEL_URL=https://your-deployment-url.vercel.app`
+  
+  >(Replace your-deployment-url with your actual deployment URL; exclude the trailing /.)
+- `GITHUB_TOKEN=your-github-personal-access-token`
+  
+  >(Create your token by navigating to GitHub → Settings → Developer Settings → Personal Access Tokens → Tokens (Classic). Grant it repo permissions.)
 
-- Add your production URL as "NEXT_PUBLIC_VERCEL_URL=https://adhityanadooli.vercel.app" exclude the / at end
-
-- Add your Github Personal Acsess Token (PAT) as GITHUB_TOKEN (Open Github > Settings > Developer Settings > Personal Acsess Tokens > New> Tokens (Classic) > Give it repo permissions
-
-- Add these Vars in your env variables for Next.JS
-
-
+4. Change details like your projects and other information in `data/index.tsx`
+   
 ---
 ### [🌐 Live Demo](https://adhityanadooli.vercel.app/)
 ---
