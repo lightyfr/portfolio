@@ -134,26 +134,21 @@ interface GitHubData {
 
 export async function fetchGitHubData(): Promise<GitHubData> {
   const baseUrl = process.env.NODE_ENV === 'production' 
-      ? `${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-      : 'https://special-winner-5wqq4g59g65hv6xj-3000.app.github.dev';
-  
-  const fetchWithRetry = async (url: string, options?: RequestInit, retries = 1, backoff = 5000) => {
+    ? process.env.NEXT_PUBLIC_VERCEL_URL 
+    : 'http://localhost:3000';
+
+  const fetchWithRetry = async (
+    url: string, 
+    options?: RequestInit, 
+    retries = 3, 
+    backoff = 1000
+  ) => {
     try {
-      console.log(`Fetching URL: ${url}`);
       const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`GitHub API error: ${response.statusText}`);
-      }
-      const text = await response.text();
-      try {
-        return JSON.parse(text);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (e) {
-        throw new Error('Invalid JSON response');
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
     } catch (error) {
       if (retries > 0) {
-        console.warn(`Retrying... (${retries} attempts left)`);
         await new Promise(resolve => setTimeout(resolve, backoff));
         return fetchWithRetry(url, options, retries - 1, backoff * 2);
       }
@@ -167,14 +162,14 @@ export async function fetchGitHubData(): Promise<GitHubData> {
       totalCommits: data.commits || profileConfig.github.totalCommits,
       totalRepos: data.totalRepos || profileConfig.github.totalProjects,
       totalStars: data.totalStars || profileConfig.github.totalStars,
-      yearsOfExperience: 2 // Hardcoded as it's not from API
+      yearsOfExperience: 2
     };
   } catch (error) {
-    console.error('Error fetching GitHub data:', error);
+    console.error('Failed to fetch GitHub data:', error);
     return {
       totalCommits: profileConfig.github.totalCommits,
-      totalStars: profileConfig.github.totalStars,
       totalRepos: profileConfig.github.totalProjects,
+      totalStars: profileConfig.github.totalStars,
       yearsOfExperience: 2
     };
   }
