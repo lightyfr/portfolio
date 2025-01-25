@@ -378,21 +378,21 @@ export const testimonials: testimonialsTypes[] = [
   {
     id: 2,
     name: 'John Anderson',
-    description: 'Working with Pragadesh was a game-changer for my online business. His web design skills are exceptional.',
+    description: 'Working with Adhitya was a game-changer for my online business. His web design skills are exceptional.',
     location: 'Sydney, Australia.',
     avatar: client_2,
   },
   {
     id: 3,
     name: 'Mark Davis',
-    description: 'Pragadesh’s creativity and technical expertise transformed our website into a visually stunning platform.',
+    description: 'Adhitya’s creativity and technical expertise transformed our website into a visually stunning platform.',
     location: 'London, UK.',
     avatar: client_3,
   },
   {
     id: 4,
     name: 'Laura Adams',
-    description: 'Pragadesh is a artist when it comes to website. He transformed my outdated website into a modern masterpiece.',
+    description: 'Adhitya is a artist when it comes to website. He transformed my outdated website into a modern masterpiece.',
     location: 'Madrid, Spain.',
     avatar: client_4,
   }
