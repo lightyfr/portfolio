@@ -70,7 +70,7 @@ let AvatarMe: string;
 if (profileConfig.linkedinProfilePic == false) {
   AvatarMe = `https://github.com/${profileConfig.github.username}.png`;
 } else {
-  AvatarMe = `${profileConfig.linkedin.profileURL}picture`;
+  AvatarMe = `${profileConfig.linkedin.profilePicSRC}`;
 }
 
 export { AvatarMe };

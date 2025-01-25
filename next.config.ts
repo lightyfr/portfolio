@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         hostname: 'www.linkedin.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+        pathname: '/**',
+      },
     ],
   }
 };
