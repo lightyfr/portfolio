@@ -24,6 +24,24 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: `${profileConfig.name} • Portfolio`,
   description: profileConfig.description,
+  openGraph: {
+    title: `${profileConfig.name} • Portfolio`,
+    description: profileConfig.description,
+    images: [
+      {
+        url: `https://github.com/${profileConfig.github.username}.png`,
+        width: 800,
+        height: 800,
+        alt: `${profileConfig.name} Portfolio Image`
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${profileConfig.name} • Portfolio`,
+    description: profileConfig.description,
+    images: `https://github.com/${profileConfig.github.username}.png`
+  }
 };
 
 export default function RootLayout({
