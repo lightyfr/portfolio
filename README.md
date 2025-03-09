@@ -36,6 +36,6 @@ Update the `userConfig.tsx` file with your personal details.
 4. Change details like your projects and other information in `data/index.tsx`
    
 ---
-### [🌐 Live Demo](https://adhityanadooli.vercel.app/)
+### [🌐 My Live Demo](https://adhityanadooli.vercel.app/)
 ---
 
