@@ -1,4 +1,4 @@
-# 🚀 Portfolio Maker
+# 🚀 Seamless Portfolio w/ Github Contributions
 Easily create a stunning developer portfolio in minutes! Fork this repository, customize a single config file, and deploy your personalized portfolio website effortlessly.
 
 ---
