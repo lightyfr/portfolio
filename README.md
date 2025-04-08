@@ -22,7 +22,7 @@ ___
 Create your copy by forking this repository.
 
 2. Edit Configuration
-Update the `userConfig.tsx` file with your personal details.
+Update the `userConfig.tsx` file with your personal details & information.
 
 3. Set Up Environment Variables
 
